@@ -1,0 +1,84 @@
+//
+//  main.cpp
+//  StableMarriage
+//
+//  Created by Sihang Li on 10/2/17.
+//  Copyright © 2017 Sihang Li. All rights reserved.
+//
+
+#include <iostream>
+#include <iomanip>
+using namespace std;
+bool ok (int q[], int c);
+void print (int q[],int &counter);
+void backtrack (int &c);
+
+int main(){
+    int c=1, n=3;
+    int q[n];
+    int counter=0;
+    q[0]=0;
+    bool backtracked=false;
+    
+    while (true){
+        while (c<3){
+            if (backtracked==false)
+                q[c]=-1;    //Resets number of woman to -1 for following increment if backtracked
+            backtracked=true;
+            
+            while (q[c]<n){
+                q[c]++;
+                if (q[c]==n){
+                    backtrack(c);
+                    backtracked=true;
+                    break;
+                }
+                if (ok (q,c)){
+                    backtracked=false;  //If a solution is found, no backtrack is needed, set backtraced to false
+                    c++;                //Moves to the next column
+                    break;              //Breaks out of the row loop
+                }
+            }
+        }
+        print (q,counter); //Reaches this statement when all solutions are found, go to print
+        backtrack(c);
+        backtracked=true;   //Backtracked inside the print function, set backtracked to true.
+    }
+}
+
+bool ok (int q[],int c){
+    int mp[3][3]={
+            {0,2,1},    //first man perfers 0 to 2 to 1
+            {0,2,1},    //second man perfers 0 to 2 to 1
+            {1,2,0}     //third man perfers 1 to 2 to 0
+    };
+    int wp[3][3]={
+            {2,1,0},    //first woman perfers 2 to 1 to 0
+            {0,1,2},    //second woman perfers 0 to 1 to 2
+            {2,0,1}     //third woman perfers 2 to 0 to 1
+    };
+    int cm=c;
+    int cw=q[c];
+    for (int i=0; i<c; i++){
+        int nm=i, nw=q[i];
+        if(cw==nw) return false;
+        if((mp[nm][nw]>mp[nm][cw])&&(wp[cw][cm]>wp[cw][nm])) return false;
+        if((wp[nw][nm]>wp[nw][cm])&&(mp[cm][cw]>mp[cm][nw])) return false;
+    }
+    return true;
+}
+
+void print (int q[],int &counter){
+    cout<<"Solution #"<<++counter<<" is:"<<endl<<endl;
+    for(int i=0; i<3; i++)
+        cout<<q[i]<<" ";
+    cout<<endl<<endl;
+    }
+
+void backtrack(int &c){
+    c--;    //Goes back one column and find a possible solution
+    if (c==-1){ //If c reaches -1, no more solution can be found, exit the program.
+        system("PAUSE");
+        exit(1);
+    }
+}
